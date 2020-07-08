@@ -14,12 +14,13 @@ class CreateUnities extends Migration{
     Schema::create('unities', function (Blueprint $table) {
       $table->id();
       $table->foreignId('contract_id');
-      $table->unsignedInteger('integration');
+      $table->string('integration');
       $table->string('email');
       $table->string('city');
+      $table->string('state');
       $table->string('logo');
       $table->enum('type', ['Json', 'Webview', 'XML', 'HL7']);
-      $table->boolena('status');
+      $table->boolean('status');
       $table->timestamps();
     });
   }
