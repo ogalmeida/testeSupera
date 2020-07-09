@@ -46,6 +46,13 @@ php artisan serve
 ```
 Para ver o projeto em execução acesse seu [http://localhost:8000](http://localhost:8000)
 
+Credenciais para login:
+
+```bash
+email: admin@admin.com
+senha: 123456
+```
+
 ## Construído com
 
 * [Laravel](https://laravel.com/)
