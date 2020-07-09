@@ -17,7 +17,7 @@ class CreateContract extends Migration{
       $table->string('corporate_name');
       $table->string('fantasy_name');
       $table->string('email');
-      $table->string('logo');
+      $table->string('logo')->default('no-logo.png');
       $table->boolean('status');
       $table->timestamps();
     });

@@ -18,7 +18,7 @@ class CreateUnities extends Migration{
       $table->string('email');
       $table->string('city');
       $table->string('state');
-      $table->string('logo');
+      $table->string('logo')->default('no-logo.png');
       $table->enum('type', ['Json', 'Webview', 'XML', 'HL7']);
       $table->boolean('status');
       $table->timestamps();

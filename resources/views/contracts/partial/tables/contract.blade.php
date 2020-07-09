@@ -37,10 +37,10 @@
             {{ $contract->email }}
           </td>
           <td>
-            <a href="#" class="text-decoration-none"><i class="far text-primary fa-edit"></i> Editar</a>
+            <a href="{{ route('contract.show', ['contract' => $contract->id]) }}" class="text-decoration-none"><i class="far text-primary fa-edit"></i> Editar</a>
           </td>
           <td>
-            <a href="#" class="text-decoration-none"><i class="far text-danger fa-trash-alt"></i> Excluir</a>
+            <button type="button" class="bg-transparent btn" data-settings="{{ json_encode((object) ['operation' => "destroy", 'config' => "contract", 'contract' => $contract->id, 'id' => $contract->id]) }}" data-toggle="modal" data-target="#modal-index"><i class="far text-danger fa-trash-alt"></i> {{__('Excluir')}}</button>
           </td>
         </tr>
       @endforeach

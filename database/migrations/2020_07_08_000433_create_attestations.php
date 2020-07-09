@@ -13,7 +13,7 @@ class CreateAttestations extends Migration{
   public function up(){
     Schema::create('attestations', function (Blueprint $table) {
       $table->id();
-      $table->foreignId('unitie_id');
+      $table->foreignId('unity_id');
       $table->string('patient');
       $table->string('companion');
       $table->string('death');

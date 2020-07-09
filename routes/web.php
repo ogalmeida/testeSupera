@@ -26,7 +26,12 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['middleware' => 'auth'], function () {
 
-  Route::resource('/contract', 'ContractController');
+  Route::get('/modal/{contract}/{operation}/{config}/{id?}', 'ModalController@getData');
+
+  Route::resource('/contract', 'ContractController')->except('edit');
+  Route::resource('/unity', 'UnityController')->except(['index', 'create', 'show', 'edit']);
+  Route::resource('/attestation', 'AttestationController')->except(['index', 'create', 'show', 'update', 'edit']);
+  Route::resource('/contractUser', 'ContractUserController')->except(['index', 'create', 'show', 'update', 'edit']);
 
 	Route::resource('user', 'UserController', ['except' => ['show']]);
 	Route::get('profile', ['as' => 'profile.edit', 'uses' => 'ProfileController@edit']);

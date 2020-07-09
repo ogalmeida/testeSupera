@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Contract;
-use Illuminate\Http\Request;
+use App\Http\Requests\ContractRequest;
+use App\Http\Controllers\utils\Image;
 
 class ContractController extends Controller{
   /**
@@ -15,7 +16,7 @@ class ContractController extends Controller{
     return view('contracts.index')->with([
       'contracts' => Contract::orderBy('id', 'desc')->get(),
       'page' => 'list',
-      'title' => 'Listagem',
+      'title' => 'Listagem de contratos',
     ]);
   }
 
@@ -27,7 +28,7 @@ class ContractController extends Controller{
   public function create(){
     return view('contracts.index')->with([
       'page' => 'create',
-      'title' => 'Adicionar'
+      'title' => 'Adicionar contrato'
     ]);
   }
 
@@ -37,9 +38,26 @@ class ContractController extends Controller{
   * @param  \Illuminate\Http\Request  $request
   * @return \Illuminate\Http\Response
   */
-  public function store(Request $request)
-  {
-    //
+  public function store(ContractRequest $request){
+
+    if($request->hasFile('logo')){
+      $name = Image::uploadImage($request->file('logo'));
+    }
+
+    $status = Contract::create([
+      'cnpj' => $request->cnpj,
+      'corporate_name' => $request->corporate_name,
+      'fantasy_name' => $request->fantasy_name,
+      'email' => $request->email,
+      'status' => ($request->status === 'true') ? 1 : 0,
+      'logo' => isset($name) ? $name : 'no-logo.png',
+    ]);
+
+    if($status){
+      return redirect()->route('contract.show', ['contract' => $status->id])->withStatus(__('Os dados foram salvos com sucesso!'));
+    } else {
+      return redirect()->route('contract.create')->withStatus(__('Houve um problema ao salvar os dados!'));
+    }
   }
 
   /**
@@ -48,9 +66,14 @@ class ContractController extends Controller{
   * @param  \App\Contract  $contract
   * @return \Illuminate\Http\Response
   */
-  public function show(Contract $contract)
-  {
-    //
+  public function show(Contract $contract){
+    return view('contracts.index')->with([
+      'contract' => $contract,
+      'unities' => $contract->unities()->orderBy('id', 'desc')->get(),
+      'contractUsers' => $contract->contractUsers()->orderBy('id', 'desc')->get(),
+      'page' => 'show',
+      'title' => 'Editar contrato',
+    ]);
   }
 
   /**
@@ -59,8 +82,7 @@ class ContractController extends Controller{
   * @param  \App\Contract  $contract
   * @return \Illuminate\Http\Response
   */
-  public function edit(Contract $contract)
-  {
+  public function edit(Contract $contract){
     //
   }
 
@@ -71,9 +93,24 @@ class ContractController extends Controller{
   * @param  \App\Contract  $contract
   * @return \Illuminate\Http\Response
   */
-  public function update(Request $request, Contract $contract)
-  {
-    //
+  public function update(ContractRequest $request, Contract $contract){
+    if($request->hasFile('logo')){
+      $name = Image::uploadImage($request->file('logo'));
+      $contract->fill([
+        'logo' => $name
+      ]);
+    }
+    $contract->fill([
+      'cnpj' => $request->cnpj,
+      'corporate_name' => $request->corporate_name,
+      'fantasy_name' => $request->fantasy_name,
+      'email' => $request->email,
+      'status' => ($request->status === 'true') ? 1 : 0,
+    ]);
+
+    $contract->save();
+
+    return back()->withStatus(__('Os dados foram salvos com sucesso!'));
   }
 
   /**
@@ -82,8 +119,11 @@ class ContractController extends Controller{
   * @param  \App\Contract  $contract
   * @return \Illuminate\Http\Response
   */
-  public function destroy(Contract $contract)
-  {
-    //
+  public function destroy(Contract $contract){
+    unlink(public_path('img/'.$contract->logo));
+    $contract->unities()->delete();
+    $contract->contractUsers()->delete();
+    $contract->delete();
+    return back()->withStatus(__('O contrato foi excluído com sucesso!'));
   }
 }
