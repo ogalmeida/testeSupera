@@ -14,7 +14,7 @@ class CreateContractUsers extends Migration{
     Schema::create('contract_users', function (Blueprint $table) {
       $table->id();
       $table->foreignId('contract_id');
-      $table->string('cpf');
+      $table->string('cpf')->unique();
       $table->string('name');
       $table->timestamps();
     });

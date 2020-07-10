@@ -14,8 +14,8 @@ class CreateUnities extends Migration{
     Schema::create('unities', function (Blueprint $table) {
       $table->id();
       $table->foreignId('contract_id');
-      $table->string('integration');
-      $table->string('email');
+      $table->string('integration')->unique();
+      $table->string('email')->unique();
       $table->string('city');
       $table->string('state');
       $table->string('logo')->default('no-logo.png');

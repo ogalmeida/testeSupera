@@ -31,7 +31,9 @@ class ContractUserController extends Controller{
   * @return \Illuminate\Http\Response
   */
   public function store(ContractUserRequest $request){
-    dd('to aqui');
+    if(!$this->cpfVerification($request->cpf)){
+      return back()->with(['error' => 'O CPF informado é inválido ou já existe um usuário com este CPF!']);
+    }
 
     $status = ContractUser::create($request->except('_token'));
 
@@ -83,5 +85,36 @@ class ContractUserController extends Controller{
     $id = $contractUser->contract_id;
     $contractUser->delete();
     return back()->withStatus(__('O usuário foi excluído com sucesso!'));
+  }
+
+  private function cpfVerification($cpf){
+    return !ContractUser::where('cpf', $cpf)->first() && $this->validateCpf($cpf);
+  }
+
+  private function validateCpf($cpf){
+    // Extrai somente os números
+    $cpf = preg_replace( '/[^0-9]/is', '', $cpf );
+
+    // Verifica se foi informado todos os digitos corretamente
+    if (strlen($cpf) != 11) {
+        return false;
+    }
+
+    // Verifica se foi informada uma sequência de digitos repetidos. Ex: 111.111.111-11
+    if (preg_match('/(\d)\1{10}/', $cpf)) {
+        return false;
+    }
+
+    // Faz o calculo para validar o CPF
+    for ($t = 9; $t < 11; $t++) {
+        for ($d = 0, $c = 0; $c < $t; $c++) {
+            $d += $cpf[$c] * (($t + 1) - $c);
+        }
+        $d = ((10 * $d) % 11) % 10;
+        if ($cpf[$c] != $d) {
+            return false;
+        }
+    }
+    return true;
   }
 }

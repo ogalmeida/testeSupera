@@ -13,10 +13,10 @@ class CreateContract extends Migration{
   public function up(){
     Schema::create('contracts', function (Blueprint $table) {
       $table->id();
-      $table->string('cnpj');
+      $table->string('cnpj')->unique();
       $table->string('corporate_name');
       $table->string('fantasy_name');
-      $table->string('email');
+      $table->string('email')->unique();
       $table->string('logo')->default('no-logo.png');
       $table->boolean('status');
       $table->timestamps();

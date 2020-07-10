@@ -14,7 +14,7 @@ class ContractController extends Controller{
   */
   public function index(){
     return view('contracts.index')->with([
-      'contracts' => Contract::orderBy('id', 'desc')->get(),
+      'contracts' => Contract::orderBy('id', 'desc')->paginate(8, ['*'], 'contracts'),
       'page' => 'list',
       'title' => 'Listagem de contratos',
     ]);
@@ -39,6 +39,14 @@ class ContractController extends Controller{
   * @return \Illuminate\Http\Response
   */
   public function store(ContractRequest $request){
+
+    if($this->validateEmail($request->email)){
+      return back()->with(['error' => 'Já existe uma unidade com esse endereço de Email!']);
+    }
+
+    if($this->validateCnpj($request->cnpj)){
+      return back()->with(['error' => 'Já existe uma unidade com esse CNPJ!']);
+    }
 
     if($request->hasFile('logo')){
       $name = Image::uploadImage($request->file('logo'));
@@ -69,8 +77,8 @@ class ContractController extends Controller{
   public function show(Contract $contract){
     return view('contracts.index')->with([
       'contract' => $contract,
-      'unities' => $contract->unities()->orderBy('id', 'desc')->get(),
-      'contractUsers' => $contract->contractUsers()->orderBy('id', 'desc')->get(),
+      'unities' => $contract->unities()->orderBy('id', 'desc')->paginate(8, ['*'], 'unities'),
+      'contractUsers' => $contract->contractUsers()->orderBy('id', 'desc')->paginate(8, ['*'], 'contractUsers'),
       'page' => 'show',
       'title' => 'Editar contrato',
     ]);
@@ -94,6 +102,19 @@ class ContractController extends Controller{
   * @return \Illuminate\Http\Response
   */
   public function update(ContractRequest $request, Contract $contract){
+
+    $sameEmail = $this->validateEmail($request->email);
+
+    if($sameEmail && ($sameEmail->id !== $contract->id)){
+      return back()->with(['error' => 'Já existe uma unidade com esse endereço de Email!']);
+    }
+
+    $sameCnpj = $this->validateCnpj($request->cnpj);
+
+    if($sameCnpj && ($sameCnpj->id !== $contract->id)){
+      return back()->with(['error' => 'Já existe uma unidade com esse CNPJ!']);
+    }
+
     if($request->hasFile('logo')){
       $name = Image::uploadImage($request->file('logo'));
       $contract->fill([
@@ -125,5 +146,13 @@ class ContractController extends Controller{
     $contract->contractUsers()->delete();
     $contract->delete();
     return back()->withStatus(__('O contrato foi excluído com sucesso!'));
+  }
+
+  private function validateEmail($email){
+    return Contract::where('email', $email)->first();
+  }
+
+  private function validateCnpj($cnpj){
+    return Contract::where('cnpj', $cnpj)->first();
   }
 }

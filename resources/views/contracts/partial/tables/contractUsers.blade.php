@@ -23,4 +23,5 @@
       @endforeach
     </tbody>
   </table>
+  {{ $contractUsers->links() }}
 </div>

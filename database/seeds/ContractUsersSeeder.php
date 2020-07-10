@@ -18,12 +18,12 @@ class ContractUsersSeeder extends Seeder{
       [
         'contract_id' => '2',
         'name' => 'Usuário 2',
-        'cpf' => '12345678909',
+        'cpf' => '98765432165',
       ],
       [
         'contract_id' => '2',
         'name' => 'Usuário 3',
-        'cpf' => '12345678909',
+        'cpf' => '95132467895',
       ]
     ];
 

@@ -32,6 +32,15 @@ class UnityController extends Controller{
   * @return \Illuminate\Http\Response
   */
   public function store(UnityRequest $request){
+
+    if($this->validateIntegration($request->integration)){
+      return back()->with(['error' => 'Já existe uma unidade com essa Integração!']);
+    }
+
+    if($this->validateEmail($request->email)){
+      return back()->with(['error' => 'Já existe uma unidade com esse endereço de Email!']);
+    }
+
     if($request->hasFile('logo')){
       $name = Image::uploadImage($request->file('logo'));
     }
@@ -82,6 +91,19 @@ class UnityController extends Controller{
   * @return \Illuminate\Http\Response
   */
   public function update(UnityRequest $request, Unity $unity){
+
+    $sameIntegration = $this->validateIntegration($request->integration);
+
+    if($sameIntegration && ($sameIntegration->id !== $unity->id)){
+      return back()->with(['error' => 'Já existe uma unidade com essa Integração!']);
+    }
+
+    $sameEmail = $this->validateEmail($request->email);
+
+    if($sameEmail && ($sameEmail->id !== $unity->id)){
+      return back()->with(['error' => 'Já existe uma unidade com esse endereço de Email!']);
+    }
+
     if($request->hasFile('logo')){
       $name = Image::uploadImage($request->file('logo'));
       $unity->fill([
@@ -113,5 +135,13 @@ class UnityController extends Controller{
     $unity->attestations()->delete();
     $unity->delete();
     return back()->withStatus(__('A unidade foi excluída com sucesso!'));
+  }
+
+  private function validateIntegration($integration){
+    return Unity::where('integration', $integration)->first();
+  }
+
+  private function validateEmail($email){
+    return Unity::where('email', $email)->first();
   }
 }
